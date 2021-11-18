@@ -1,0 +1,51 @@
+<?php
+namespace App\Controllers;
+
+use App\Models\Pengguna;
+
+class Login extends BaseController{
+
+    
+    public function cekLogin(){
+        $e = $this->request->getPost('email');
+        $s = $this->request->getPost('sandi');
+
+        $valid =  $this->validate([
+            'email' => 'required',
+            'sandi' => 'required'
+         ], [
+             'email'=>[
+                 'required'     =>'Email tidak boleh kosong'
+             ],
+             'sandi'=>[
+                 'required'     =>'Sandi tidak boleh kosong'
+             ]
+         ]);
+        
+
+         $this->session->set('email', $e);
+         $this->session->set('sandi', $s);
+
+         
+         if($valid == false){
+             $this->session->setFlashdata(
+                 'validator', $this->validator
+             );
+            return redirect()->to('/login');
+         }else{
+
+            $vl = (new Pengguna())->cekLogin($e , $s); 
+
+            if ($vl == null){
+                return redirect()->to('/login')->with('error', 'user dan password salah');
+            }else{
+                $this->session->set('sudahLogin', true);
+             return redirect()->to('/beranda');
+            }
+           
+         }
+    }
+    public function beranda(){
+
+    }
+}
